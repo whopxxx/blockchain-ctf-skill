@@ -1,308 +1,212 @@
-可以。我按**2024–2026 共 30 道有代表性的区块链 CTF 题**整理，重点不是单纯堆题名，而是方便你后面分析“哪些已经出烂、哪些适合继续创新”。
+# Blockchain CTF Skill Research Brief
 
-### 区块链 CTF 题目整理
+## Document Status
 
-| # | 年份 / 赛事 | 题目 | 链 / 技术 | 核心考点 | 类型 |
-|---|---|---|---|---|---|
-| 1 | 2026 SEKAI CTF | **PP Farming** | Ethereum / Solidity | 经典 CEI 失误、reentrancy | 基础漏洞 |
-| 2 | 2026 SEKAI CTF | **PP Farming 2** | EVM | Transparent Proxy、`delegatecall`、storage collision、错误修复引入新漏洞 | ⭐协议/代理 |
-| 3 | 2026 SEKAI CTF | **Open World** | **TON** | shared-instance economy、跨实例资金、链上经济状态 | ⭐非 EVM |
-| 4 | 2026 SEKAI CTF | **Outer Stellar** | **Stellar + Sui** | bridge、relayer、attestation、未签名参数、交易抢先执行 | ⭐跨链 |
-| 5 | 2026 Sui CTF | **Merchant** | Sui Move | Coin object、拆分/合并 Coin、精确付款 | 入门 Move |
-| 6 | 2026 Sui CTF | **Moving Window** | Sui Move | 时间窗口、链上时间语义 | 链语义 |
-| 7 | 2026 Sui CTF | **Lootboxes** | Sui Move | randomness + `public` function + PTB transaction atomicity、composition attack | ⭐新型 |
-| 8 | 2026 Sui CTF | **Staking** | Sui Move | receipt 合并、累计状态与真实时间不一致 | ⭐状态 invariant |
-| 9 | 2026 Sui CTF | **Sabotage Arena** | Sui Move | shared object、多玩家 PvP、共享链状态 | ⭐PvP |
-| 10 | 2026 picoCTF | **Access Control** | Ethereum | `private` storage 并不私密、storage slot | 教学 |
-| 11 | 2026 picoCTF | **Smart Overflow** | Solidity <0.8 | `uint256` overflow | 教学 |
-| 12 | 2026 picoCTF | **Front Running** | Ethereum | transaction calldata、失败交易数据、front-running 思想 | MEV 入门 |
-| 13 | 2026 picoCTF | **Reentrance** | Ethereum | 经典 reentrancy | 教学 |
-| 14 | 2025 bi0sCTF | **Transient Heist** | EVM / DeFi | **EIP-1153 transient storage**、slot confusion、token validation | ⭐新 EVM |
-| 15 | 2025 bi0sCTF | **Transient Heist Revenge** | EVM / DeFi | transient storage + `CREATE2` 地址构造 + callback/composition | ⭐高级 |
-| 16 | 2025 CODEGATE Finals | **DEX** | 双 EVM 链 | cross-chain DEX、off-chain relayer、跨链 accounting / amount bug | ⭐跨链 |
-| 17 | 2025 HTB Cyber Apocalypse | **Eldorion** | Ethereum | 同一 transaction 内多次调用、block/timestamp 语义 | 基础 |
-| 18 | 2025 HTB Cyber Apocalypse | **HeliosDEX** | Ethereum / DeFi | rounding error、ERC20、兑换经济模型 | DeFi 数学 |
-| 19 | 2025 HTB Cyber Apocalypse | **EldoriaGate** | EVM | storage、assembly、角色编码边界问题 | EVM 基础进阶 |
-| 20 | 2024 BlazCTF | **Eight Inch** | Ethereum / DeFi | intent / trade settlement、整数除法与部分成交 accounting | DeFi |
-| 21 | 2024 BlazCTF | **Solalloc** | **Solana / C** | 手工 allocator、integer overflow、pointer corruption | ⭐Blockchain + Pwn |
-| 22 | 2024 BlazCTF | **Chisel as a Service** | Foundry / Chisel | Solidity REPL sandbox、工具链攻击面 | ⭐Blockchain + Pwn/Web |
-| 23 | 2024 BlazCTF | **Teragas** | 自定义 EVM | revert 时 state 没正确 rollback、forked Ethereum、King-of-the-Hill | ⭐VM 实现 |
-| 24 | 2024 SEKAI CTF | **Play to Earn** | Ethereum | token accounting、permit / signature 相关逻辑 | 合约逻辑 |
-| 25 | 2024 SEKAI CTF | **イベント！ (Ibennto!)** | Blockchain | 复杂链上业务逻辑 | 高难综合 |
-| 26 | 2024 SEKAI CTF | **SURVIVE** | Blockchain | 复杂状态/协议交互 | 高难综合 |
-| 27 | 2024 SEKAI CTF | **Zoo** | EVM Assembly | memory corruption、function pointer、inline assembly、绕过 Pausable | ⭐EVM Pwn |
-| 28 | 2024 HTB Business CTF | **NotADemocraticElection** | Ethereum | signature forgery | 签名 |
-| 29 | 2024 HTB Business CTF | **MetaVault** | Ethereum | contract metadata、所谓链上“秘密”、self verification | 元数据 |
-| 30 | 2024 HTB Business CTF | **Brokenswap** | Ethereum / DEX | DEX 资金窃取、经济/交换逻辑漏洞 | DeFi |
+This file is a cleaned research brief derived from earlier planning conversations. It is input for the execution agent, not runtime instructions for the final skill.
 
-SEKAI CTF 2026 官方给出的四道区块链题分别是 PP Farming、PP Farming 2、Open World 和 Outer Stellar，难度从 Easy 到 Expert；公开分析显示 PP Farming 2 的关键在代理 `delegatecall` 与 storage collision，而 Open World 已经把考点扩展到了 TON 的共享经济状态。[GitHub](https://github.com/project-sekai-ctf/sekaictf-2026?utm_source=chatgpt.com) Outer Stellar 更进一步，把 Stellar/Sui、bridge、relayer 和 attestation 放进一个题里，是目前非常值得研究的跨链题型。[XESXOR](https://xesxor.com/writeups/htb-blockchain-outer-stellar?utm_source=chatgpt.com)
+All challenge names, dates, repository paths, vulnerability summaries, and third-party project descriptions below are research candidates until checked against a primary source. An entry may be useful even when only a writeup is available, but it must not be promoted into the benchmark corpus as verified metadata without an immutable upstream revision and a reproducible setup.
 
-Sui 官方 CTF 包括 Merchant、Moving Window、Lootboxes、Staking、Sabotage Arena；其中 Lootboxes 的重点是 Move 函数可组合性与 transaction atomicity，Staking 则是 receipt 状态累计破坏时间 invariant，Sabotage Arena 直接使用多人 shared-state PvP。[GitHub](https://github.com/MystenLabs/CTF?utm_source=chatgpt.com)
+Use this evidence order:
 
-picoCTF 2026 的四题则很好地代表了**教学型赛道**：storage read、旧版 Solidity integer overflow、calldata/front-running 和 reentrancy。它们适合入门，但如果你是准备出高级比赛题，就不建议再把这些漏洞单独作为核心。[187OnAnUndercoverCop's Blog](https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/)
+1. official challenge source, release, deployment scripts, and verifier;
+2. protocol/framework specifications and implementation source;
+3. organizer or author writeup;
+4. independent writeup;
+5. this brief.
 
-2025 的 bi0sCTF 很值得研究，因为 Transient Heist 系列把 **EIP-1153 transient storage** 引入了 CTF：第一题涉及 transient slot confusion 和输入验证，Revenge 又加入 `CREATE2` 地址构造和 re-entry/composition，已经明显不是传统的“找到一个 require 漏洞”。[bi0s Pentest](https://pentest.bi0s.in/blog/posts/TransientHeist-bi0sCTF2025/?utm_source=chatgpt.com) CODEGATE Finals 2025 的 DEX 则实现了两条链和链下 relayer，核心是跨链 swap/accounting 行为，非常接近真实跨链协议的攻击面。[teddyctf](https://thesavageteddy.github.io/featured/codegate-finals-2025/?utm_source=chatgpt.com)
+Remove tracking parameters from retained links. Record the commit, tag, or release used for any benchmark.
 
-HTB Cyber Apocalypse 2025 的三题形成了不错的难度梯度：Eldorion 考单 transaction 调用语义，HeliosDEX 考 rounding 和 DEX accounting，EldoriaGate 开始进入 assembly/storage。[GitHub](https://github.com/hackthebox/cyber-apocalypse-2025?utm_source=chatgpt.com)
+## Project Goal
 
-2024 BlazCTF 则很能体现“Web3 CTF 不一定只是 Solidity”：Solalloc 是 **Solana+C 的内存破坏**；Chisel as a Service 打的是 Foundry/Chisel 工具链 sandbox；Teragas 甚至直接把 **EVM 实现错误**做成 King-of-the-Hill——其关键缺陷是 revert 后状态没有正确回滚。[Neplox](https://neplox.security/ctf/blazctf-2024-solalloc-writeup?utm_source=chatgpt.com) Eight Inch 则属于典型 DeFi accounting/整数除法组合题。[Mystiz](https://mystiz.hk/posts/2024/2024-09-28-blazctf/?utm_source=chatgpt.com)
-
-SEKAI CTF 2024 的四道 blockchain 题是 Play to Earn、イベント！、SURVIVE 和 Zoo；尤其 Zoo 已经接近 **EVM pwn**，涉及 inline assembly、memory layout/越界修改和控制执行逻辑。[GitHub](https://github.com/project-sekai-ctf/sekaictf-2024/blob/main/README.md?utm_source=chatgpt.com) HTB Business CTF 2024 则明确覆盖签名伪造、contract metadata 和 DEX 漏洞。[GitHub](https://github.com/hackthebox/business-ctf-2024?utm_source=chatgpt.com)
-
-### 从这 30 道题提炼出的出题方向
-
-如果你的目标是**自己出 2026 风格的新题**，我会把题型归成下面这几条主线：
-
-| 方向 | 已经成熟程度 | 适合怎么出 |
-|---|---:|---|
-| Reentrancy / overflow / private storage | 很成熟 | 只适合 Easy |
-| DEX rounding / accounting | 成熟 | 和其他组件组合 |
-| Proxy / delegatecall / storage | 中高 | 很适合 Medium–Hard |
-| Transient Storage / 新 EIP | **较新** | 很适合 Hard |
-| Move / Sui object model | **较新** | 很适合 Hard |
-| TON / Stellar / 非 EVM | **较新** | 很适合制造陌生感 |
-| Cross-chain + relayer | **热门** | 很适合 Hard–Expert |
-| MEV / transaction ordering | **上升中** | 可做动态题 |
-| Shared state / PvP | **很有潜力** | 比静态单实例题新颖 |
-| EVM implementation bug | **少见且高级** | Expert |
-| Blockchain + Pwn | **少见** | Solana/C、VM、WASM |
-| Blockchain forensic | **明显增长** | 可结合真实交易数据 |
-| ZK / proof verification | **前沿** | Expert / Crypto 混合 |
-
-如果是为了**找一个还没被出烂的题目方向**，我会优先研究：
-
-**跨链 relayer / attestation → Sui Move composability → EIP-1153 → EVM/WASM 实现层 → 链上 PvP/shared state → ZK protocol integration**。
-
-其中 **Outer Stellar、Lootboxes、Transient Heist Revenge、Solalloc、Teragas、Zoo** 这 6 道，我建议优先拆源码，它们比传统 Solidity 漏洞题更能代表近两年的出题变化。[XESXOR](https://xesxor.com/writeups/htb-blockchain-outer-stellar?utm_source=chatgpt.com)
-
-
-有。下面把我上一条列的 **30 道题逐一对应到具体页面**。我优先放官方源码；没有方便公开的官方源码时，标成「Writeup」。SEKAI、Sui、BlazCTF 和 HTB Business 的官方仓库都还可以直接查看源码。[GitHub](https://github.com/project-sekai-ctf/sekaictf-2026)
-
-| # | 题目 | 链接 | 类型 |
-|---|---|---|---|
-| 1 | SEKAI 2026 — PP Farming | [PP Farming 官方源码](https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/pp-farming?utm_source=chatgpt.com) | 官方 |
-| 2 | SEKAI 2026 — PP Farming 2 | [PP Farming 2 官方源码](https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/pp-farming-2?utm_source=chatgpt.com) | 官方 |
-| 3 | SEKAI 2026 — Open World | [Open World 官方源码](https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/open-world?utm_source=chatgpt.com) | 官方 |
-| 4 | SEKAI 2026 — Outer Stellar | [Outer Stellar 官方源码](https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/OuterStellar?utm_source=chatgpt.com) | 官方 |
-| 5 | Sui CTF — Merchant | [merchant.move](https://github.com/MystenLabs/CTF/blob/main/contracts/sources/merchant.move?utm_source=chatgpt.com) | 官方源码 |
-| 6 | Sui CTF — Moving Window | [moving_window.move](https://github.com/MystenLabs/CTF/blob/main/contracts/sources/moving_window.move?utm_source=chatgpt.com) | 官方源码 |
-| 7 | Sui CTF — Lootboxes | [lootboxes.move](https://github.com/MystenLabs/CTF/blob/main/contracts/sources/lootboxes.move?utm_source=chatgpt.com) | 官方源码 |
-| 8 | Sui CTF — Staking | [staking.move](https://github.com/MystenLabs/CTF/blob/main/contracts/sources/staking.move?utm_source=chatgpt.com) | 官方源码 |
-| 9 | Sui CTF — Sabotage Arena | [sabotage_arena.move](https://github.com/MystenLabs/CTF/blob/main/contracts/sources/sabotage_arena.move?utm_source=chatgpt.com) | 官方源码 |
-| 10 | picoCTF 2026 — Access Control | [Access Control 题解/代码](https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/?utm_source=chatgpt.com#access-control) | Writeup |
-| 11 | picoCTF 2026 — Smart Overflow | [Smart Overflow 题解/代码](https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/?utm_source=chatgpt.com#smart-overflow) | Writeup |
-| 12 | picoCTF 2026 — Front Running | [Front Running 题解/代码](https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/?utm_source=chatgpt.com#front-running) | Writeup |
-| 13 | picoCTF 2026 — Reentrance | [Reentrance 题解/代码](https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/?utm_source=chatgpt.com#reentrance) | Writeup |
-| 14 | bi0sCTF 2025 — Transient Heist | [Transient Heist 完整 Writeup](https://pentest.bi0s.in/blog/posts/TransientHeist-bi0sCTF2025/?utm_source=chatgpt.com) | 作者/bi0s Writeup |
-| 15 | bi0sCTF 2025 — Transient Heist Revenge | [Transient Heist Revenge 完整 Writeup](https://pentest.bi0s.in/blog/posts/TransientHeistRevenge-bi0sCTF2025/?utm_source=chatgpt.com) | 作者/bi0s Writeup |
-| 16 | CODEGATE Finals 2025 — DEX | [CODEGATE 2025 DEX Writeup](https://hodl.page/entry/codegate-2025-final-blockchain-dex?utm_source=chatgpt.com) | Writeup |
-| 17 | HTB Cyber Apocalypse 2025 — Eldorion | [HTB 2025 官方仓库 Blockchain](https://github.com/hackthebox/cyber-apocalypse-2025/tree/main/blockchain?utm_source=chatgpt.com) | 官方仓库 |
-| 18 | HTB Cyber Apocalypse 2025 — HeliosDEX | [HeliosDEX 详细分析](https://github.com/sn0x-sharma/Redteam-Notes/blob/main/capture-the-flag-tournaments/cyber-apocalypse-ctf-2025-tales-from-eldoria.md?utm_source=chatgpt.com#blockchain--heliosdex) | Writeup |
-| 19 | HTB Cyber Apocalypse 2025 — EldoriaGate | [Cyber Apocalypse 2025 官方 Blockchain 目录](https://github.com/hackthebox/cyber-apocalypse-2025/tree/main/blockchain?utm_source=chatgpt.com) | 官方仓库 |
-| 20 | BlazCTF 2024 — Eight Inch | [Eight Inch 官方源码](https://github.com/fuzzland/blazctf-2024/tree/main/eight-inch?utm_source=chatgpt.com) | 官方 |
-| 21 | BlazCTF 2024 — Solalloc | [Solalloc 官方源码](https://github.com/fuzzland/blazctf-2024/tree/main/solalloc?utm_source=chatgpt.com) | 官方 |
-| 22 | BlazCTF 2024 — Chisel as a Service | [Chisel as a Service 官方源码](https://github.com/fuzzland/blazctf-2024/tree/main/chisel-as-a-service?utm_source=chatgpt.com) | 官方 |
-| 23 | BlazCTF 2024 — Teragas | [Teragas 官方源码](https://github.com/fuzzland/blazctf-2024/tree/main/teragas?utm_source=chatgpt.com) | 官方 |
-| 24 | SEKAI 2024 — Play to Earn | [Play to Earn 官方源码](https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/play-to-earn?utm_source=chatgpt.com) | 官方 |
-| 25 | SEKAI 2024 — イベント！/ Ibennto! | [Ibennto 官方源码](https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/ibennto?utm_source=chatgpt.com) | 官方 |
-| 26 | SEKAI 2024 — SURVIVE | [SURVIVE 官方源码](https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/survive?utm_source=chatgpt.com) | 官方 |
-| 27 | SEKAI 2024 — Zoo | [Zoo 官方源码](https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/zoo?utm_source=chatgpt.com) | 官方 |
-| 28 | HTB Business CTF 2024 — NotADemocraticElection | [NotADemocraticElection 官方题目](https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/NotADemocraticElection%20%5BEasy%5D?utm_source=chatgpt.com) | 官方 |
-| 29 | HTB Business CTF 2024 — MetaVault | [MetaVault 官方题目](https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/MetaVault%20%5BEasy%5D?utm_source=chatgpt.com) | 官方 |
-| 30 | HTB Business CTF 2024 — Brokenswap | [Brokenswap 官方题目](https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/Brokenswap%20%5BMedium%5D?utm_source=chatgpt.com) | 官方 |
-
-几个补充：**Sui CTF 是目前最好复现的一套**，官方仓库直接给 Move 合约和 TypeScript 脚本，而且 README 明确列出了 Moving Window、Merchant、Lootboxes、Staking、Sabotage Arena 五道题。[GitHub](https://github.com/MystenLabs/CTF) **SEKAI 2026** 也非常完整，四道 blockchain 题的 challenge 和 solution 都留在官方仓库。[GitHub](https://github.com/project-sekai-ctf/sekaictf-2026) **BlazCTF 2024** 更适合研究高级出题，因为官方仓库不仅有 Eight Inch、Solalloc、Teragas，还有大量 DeFi、Solana、VM 类题目。[GitHub](https://github.com/fuzzland/blazctf-2024)
-
-另外我修正一下上一条里一个容易混淆的地方：HTB Cyber Apocalypse 2025 官方 README 的区块链表格目前显示异常，三个难度项都写成了 `Eldorion`；其他公开索引和 writeup 才明确对应 **Eldorion / HeliosDEX / EldoriaGate** 三题。[GitHub](https://github.com/hackthebox/cyber-apocalypse-2025?utm_source=chatgpt.com)
-
-如果你是为了**出题研究**，建议下载源码时优先看 **2、4、7、8、15、16、21、23、27**，这几道的信息密度最高。
-
-
-	有，但我刚查了当前可用的能力，**暂时没看到一个明确叫“Blockchain CTF Solver”或专门为区块链 CTF 做的现成 skill/agent**。更实际的做法是组合两个能力：
-
-- **Codex Security**：更适合读 Solidity/Move/Rust/C 代码、做安全扫描、找可疑状态转换和漏洞点。
-- **Blockscout Blockchain Data**：更适合查真实 EVM 链上的合约源码、ABI、交易、地址和调用历史，做链上取证题很好用。
-
-我已经把这两个可连接的插件给你推荐出来了，你可以直接在 ChatGPT 里连接后用。它们都不是“自动秒解 CTF”，但组合起来已经很接近一个区块链 CTF agent。
-
-如果你的目标是**专门刷这类题**，我其实更建议做一个固定工作流 agent，大概是：
-
-`拿到题目仓库`
-→ `识别链/语言`
-→ `定位 solve 条件`
-→ `画资产流/状态机`
-→ `扫描 access control / accounting / callback / proxy / signature`
-→ `检查链特有语义`
-→ `构造 exploit 假设`
-→ `写 Foundry/Move/TS PoC`
-→ `本地验证`
-→ `输出 exploit + 原理`
-
-针对不同技术栈再分支：
-
-`Solidity/EVM`
-→ Foundry + Slither + Echidna/Medusa + cast/anvil
-
-`Sui Move`
-→ Move object ownership + PTB + shared object + capability 分析
-
-`Solana`
-→ account ownership + PDA + signer + CPI + Rust memory/account validation
-
-`跨链`
-→ source chain → relayer → attestation → destination chain，重点检查 message authenticity 和 accounting
-
-`链上取证`
-→ transaction trace + event + bytecode + fund flow。
-
-而且这个对你前面整理的题非常合适。比如把 **PP Farming 2、Outer Stellar、Lootboxes、Transient Heist Revenge、Teragas** 喂给这个 agent，它就不是单纯问“有没有重入”，而是会按 **proxy → storage、relayer → attestation、Move composability、transient storage、VM state rollback** 各自走不同检查路径。
-
-如果你愿意，我还可以直接帮你设计一份 **「Blockchain CTF Solver Skill」的完整 skill.md**，包括：
-
-`触发条件 + 分析流程 + Solidity/Move/Solana 检查清单 + 自动调用 GitHub + exploit 模板 + 最终报告格式`
-
-这样以后你丢一个 CTF GitHub 链接进去，就按固定流程开始分析。
-
-
-有，而且我刚在 GitHub 上搜到几个**很接近你想要的“区块链 CTF Agent / Skill”**。只是目前大多数集中在 **Solidity/EVM**，真正做到 Sui + Solana + TON + EVM 全覆盖的成熟 CTF agent，我暂时没找到。
-
-| 项目 | 定位 | 和 CTF 的匹配度 |
-|---|---|---:|
-| [CalvinTjoaquinn/solexploit-gen](https://github.com/CalvinTjoaquinn/solexploit-gen) | LLM 读取 Solidity → 编写 `Exploit.sol` → Anvil 真执行验证 | ⭐⭐⭐⭐⭐ |
-| [Crimson798/GPT-Exploit-Generator](https://github.com/Crimson798/GPT-Exploit-Generator) | GPT 自动生成攻击合约 + Foundry PoC，并根据编译/Test 失败自动修复 | ⭐⭐⭐⭐⭐ |
-| [ret2happy/synapse_agents](https://github.com/ret2happy/synapse_agents) | 多 Agent 智能合约漏洞分析 | ⭐⭐⭐⭐ |
-| [0xlayerghost/solidity-agent-kit](https://github.com/0xlayerghost/solidity-agent-kit) | 给 Codex/Claude/Cursor 装 Solidity Security Skills | ⭐⭐⭐⭐ |
-| [devival/vuln-agent-eval](https://github.com/devival/vuln-agent-eval) | Solidity 漏洞 Agent 的评测框架，带 discover → verify | ⭐⭐⭐ |
-| [xternet/ethernaut-with-security-tools](https://github.com/xternet/ethernaut-with-security-tools) | 用 Foundry/Slither/Echidna/Manticore 自动/半自动解 Ethernaut | ⭐⭐⭐⭐ |
-| [Owonftt/chain-guard](https://github.com/Owonftt/chain-guard) | 多 Agent Solidity/Vyper 安全审计 | ⭐⭐⭐ |
-| [XSpoonAi/spoon-awesome-skill](https://github.com/XSpoonAi/spoon-awesome-skill) | Web3 Agent Skills，含智能合约 security analysis | ⭐⭐⭐ |
-| [contractshark/RAplus](https://github.com/contractshark/RAplus) | 符号执行 EVM bytecode，寻找重入 exploit 调用序列 | ⭐⭐⭐ |
-| [waterfall-mkt/curta.wtf](https://github.com/waterfall-mkt/curta.wtf) | EVM CTF/puzzle 平台 | ⭐⭐ |
-
-其中我最建议你先看 **solexploit-gen**。它已经非常接近“AI 自动做 CTF”的架构了：
+Build a Codex skill that helps an agent solve authorized blockchain CTF challenges from artifacts to a reproducible exploit. It should specialize the agent beyond a generic smart-contract audit by enforcing this loop:
 
 ```text
-Target.sol
-    ↓
-LLM Agent
-    ↓
-阅读目标合约
-    ↓
-生成 Exploit.sol
-    ↓
-Anvil 部署
-    ↓
-执行 pwn()
-    ↓
-检查 invariant 是否被破坏
-    ↓
-失败 → 看错误 → 修改 exploit → 再跑
+acquire challenge artifacts
+  -> identify platform, language, versions, and harness
+  -> read setup and verifier
+  -> express the observable win condition
+  -> model actors, authority, assets, state, and trust boundaries
+  -> load the relevant platform semantics
+  -> rank falsifiable exploit hypotheses
+  -> implement a native PoC
+  -> compile and execute
+  -> inspect errors, traces, events, and state deltas
+  -> revise until the verifier passes or a precise blocker is proven
+  -> report exploit, command, runtime evidence, root cause, and assumptions
 ```
 
-而且它不是让另一个 LLM 判断“攻击成功没成功”，而是真的用 **Anvil 执行 EVM bytecode**。它目前内置了 `reentrancy / access control / price oracle / signature replay` 等漏洞类型。这个设计非常适合拿来改成 CTF Solver。
+The defining property is execution-backed verification. Static analysis, fuzzing, symbolic execution, writeups, and other agents may propose hypotheses. The challenge verifier or an equivalent native state transition decides whether the exploit works.
 
-[GPT-Exploit-Generator](https://github.com/Crimson798/GPT-Exploit-Generator) 更像你实际刷比赛时想要的东西。它会：
+## Design Conclusions
+
+### Verifier-first analysis
+
+The solver should read deployment, setup, wrapper service, and success checks before searching for vulnerability patterns. The win condition must be represented as a concrete predicate over state, balance, ownership, object/account data, events, return values, or service output.
+
+### State and asset modeling
+
+The solver should build a compact model of actors, capabilities, trust boundaries, assets, and transitions. Modern challenges often depend on interactions between correct-looking components rather than one obviously vulnerable function.
+
+### Platform-specific routing
+
+A single Solidity checklist is insufficient. The final skill needs conditional playbooks for:
+
+| Route | Semantics that materially change the solve |
+|---|---|
+| EVM/Solidity/Vyper | delegatecall and storage layout, callbacks, transient storage, CREATE2, assembly/bytecode, signatures, DeFi math, transaction ordering |
+| Move/Sui | resources and abilities, object ownership, capabilities, shared objects, PTB composition, object identity/version, clocks, epochs, randomness |
+| Solana | account owner/signer/writable checks, PDA derivation, CPI privilege propagation, account aliasing, serialization, native Rust/C memory behavior |
+| Cross-chain | source event/state, observer/relayer, message format, attestation, replay state, destination execution, finality, decimal/accounting conversion |
+| TON | asynchronous messages, bounce behavior, message modes/value/fees, account state and initialization, cell serialization, cross-instance state/economy |
+| Stellar/Soroban | transaction source/signers/sequence/operations, assets/trustlines, Soroban authorization trees, storage TTL, host serialization |
+| WASM runtimes | host ABI, serialization, submessage/reply and rollback boundaries, storage namespaces, migration/admin paths |
+| Custom VM | state journaling and rollback, nested calls, exceptions, gas/refunds, opcode/host divergence, differential execution |
+| Chain forensics | source/bytecode provenance, proxy resolution, traces, events, storage/account data, transaction ordering, reproducible fund flow |
+| ZK integration | intended statement versus constraints, witness generation, public-input binding, field/range assumptions, proof encoding, verifier integration |
+
+### Native exploit feedback loop
+
+The solver should preserve the challenge's toolchain and iterate from real failures:
 
 ```text
-输入 vulnerable contract
-       ↓
-GPT 分析
-       ↓
-生成 Attack.sol
-       ↓
-生成 Foundry test
-       ↓
-forge build
-       ↓
-编译错误？
- ├─ Yes → 把错误喂回 GPT → 修复
- └─ No
-       ↓
-forge test -vvv
-       ↓
-exploit 失败？
- ├─ Yes → 分析 EVM trace → 改 exploit
- └─ No → PoC 完成
+generate the smallest compatible exploit
+  -> build
+  -> fix compiler/type/interface errors
+  -> run against the original setup
+  -> capture the first informative failure
+  -> inspect trace/revert/state delta
+  -> change one exploit assumption
+  -> rerun
 ```
 
-这个“**生成 → 编译 → trace → 修复 → 再验证**”循环，其实就是一个很不错的 CTF Agent 雏形。
+A process exit code or an LLM judgment is insufficient evidence. The solver must observe the challenge predicate or an equivalent state transition.
 
-如果你说的是严格意义上的 **Skill**，那 [solidity-agent-kit](https://github.com/0xlayerghost/solidity-agent-kit) 最值得看。它已经按照 agent skill 的方式组织，而且 README 明确支持 **Codex CLI、Claude Code、Cursor、Windsurf**。里面已经有 `solidity-security`、`solidity-audit`、`solidity-debug`、`solidity-testing`、`defi-security` 等 skill。
+### Tool roles
 
-但它偏“开发 + 审计”，还缺 CTF 最重要的一层：
+Tools are optional and should be selected by the question they answer:
 
-```text
-识别 win condition
-→ 反推 invariant
-→ 找攻击路径
-→ 编写攻击合约
-→ forge test 验证
-```
+| Role | Candidate tools | Output status |
+|---|---|---|
+| EVM build and execution | Foundry, Anvil, cast, Hardhat | Runtime evidence |
+| Static EVM analysis | compiler output, Slither | Hypothesis |
+| Sequence/invariant exploration | Echidna, Medusa, native fuzzers | Counterexample to reproduce |
+| Bytecode path exploration | disassembler, symbolic execution, Manticore-like tools | Candidate path to execute concretely |
+| Move execution | chain-specific Move CLI and test runner | Transaction/object/resource effects |
+| Solana execution | cargo, program-test, solana-test-validator, Anchor | Instruction/account/token effects |
+| Chain investigation | RPC, trace APIs, explorers or blockchain-data connectors | Reproducible state/transaction evidence |
+| Source acquisition | GitHub connector, gh, git | Pinned challenge artifacts |
 
-所以如果是你的用途，我不会从零写。
+Do not require a particular plugin, scanner, multi-agent framework, or paid service. The baseline must work as one agent using repository tools and native runtimes. Independent agents may explore separate hypotheses or run blinded evaluations when available and authorized.
 
-我会直接采用：
+## Technique Coverage and Priority
 
-**`solidity-agent-kit` 的 Skill 结构**
-+
-**`synapse_agents` 的多 Agent 漏洞分析**
-+
-**`solexploit-gen` 的真实执行 verifier**
-+
-**`GPT-Exploit-Generator` 的自动修复循环**
-+
-**Foundry / Slither / Echidna / Manticore**
+The historical sample suggests the following coverage priorities. These are design priorities, not claims about current CTF popularity.
 
-最后形成：
+| Technique family | Skill treatment |
+|---|---|
+| private storage, pre-0.8 overflow, basic reentrancy | Retain for introductory cases; do not center advanced evaluation on them |
+| access control, signatures, nonce/replay, permit | Core EVM authentication path |
+| DEX/accounting/rounding/partial fills | Core, with units and explicit formulas |
+| proxies/delegatecall/storage collision | Core medium-to-hard EVM path |
+| transient storage and new EIPs | Advanced EVM composition path |
+| same-transaction composition and transaction ordering | Core across EVM and Move-style transaction models |
+| Move object/capability/shared-state semantics | First-class non-EVM path |
+| Solana accounts/CPI plus native memory hazards | First-class blockchain-plus-pwn path |
+| relayer/attestation/cross-chain accounting | First-class multi-component path |
+| TON/Stellar/WASM semantics | Platform-discovery and native-semantics path |
+| custom VM rollback/opcode/host divergence | Expert implementation path |
+| chain forensics | Source-free evidence path |
+| ZK constraints and verifier integration | Advanced crypto/protocol path |
 
-```text
-              Blockchain CTF Agent
+## Public Challenge Candidate Catalog
 
-                     │
-              Challenge Parser
-                     │
-        ┌────────────┼─────────────┐
-        ↓            ↓             ↓
-    Solidity       Move         Solana
-      Agent        Agent          Agent
-        │
-        ↓
-  Contract Mapper
-        │
-        ↓
- Invariant Analyzer
-        │
-        ↓
- Vulnerability Hunter
-        │
-  ┌─────┼──────┬──────────┐
-  ↓     ↓      ↓          ↓
-Slither LLM  Fuzzer   Symbolic Exec
-  │
-  └─────┬──────┴──────────┘
-        ↓
- Exploit Planner
-        ↓
- Exploit.sol
-        ↓
- forge test / anvil
-        ↓
-     FAILED
-        │
-     trace
-        │
-        └────→ Agent 修改 PoC
-                  │
-                  ↓
-                PASS
-```
+Every row is `candidate-unverified`. The execution agent must confirm event metadata, source path, challenge files, license, build instructions, verifier, and vulnerability summary before use. Writeup-only entries require finding an official source or remaining secondary-source benchmarks.
 
-目前最大的空白反而很明显：**这些 GitHub 项目基本都严重偏 EVM/Solidity。**
+| ID | Event/challenge | Platform | Candidate focus | Candidate source |
+|---:|---|---|---|---|
+| 1 | SEKAI CTF 2026 / PP Farming | EVM | checks-effects-interactions and reentrancy | https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/pp-farming |
+| 2 | SEKAI CTF 2026 / PP Farming 2 | EVM | proxy, delegatecall, storage layout, faulty remediation | https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/pp-farming-2 |
+| 3 | SEKAI CTF 2026 / Open World | TON | shared-instance economy and cross-instance state/value | https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/open-world |
+| 4 | SEKAI CTF 2026 / Outer Stellar | Stellar and Sui | relayer, attestation, authenticated fields, ordering | https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/OuterStellar |
+| 5 | Sui CTF / Merchant | Sui Move | Coin object split/merge and exact payment | https://github.com/MystenLabs/CTF/blob/main/contracts/sources/merchant.move |
+| 6 | Sui CTF / Moving Window | Sui Move | time-window and chain-time semantics | https://github.com/MystenLabs/CTF/blob/main/contracts/sources/moving_window.move |
+| 7 | Sui CTF / Lootboxes | Sui Move | randomness, public functions, PTB atomic composition | https://github.com/MystenLabs/CTF/blob/main/contracts/sources/lootboxes.move |
+| 8 | Sui CTF / Staking | Sui Move | receipt aggregation and time invariant | https://github.com/MystenLabs/CTF/blob/main/contracts/sources/staking.move |
+| 9 | Sui CTF / Sabotage Arena | Sui Move | shared objects and multi-player state | https://github.com/MystenLabs/CTF/blob/main/contracts/sources/sabotage_arena.move |
+| 10 | picoCTF 2026 / Access Control | EVM | private storage visibility and slots | https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/#access-control |
+| 11 | picoCTF 2026 / Smart Overflow | EVM | legacy integer overflow | https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/#smart-overflow |
+| 12 | picoCTF 2026 / Front Running | EVM | calldata, failed transactions, ordering | https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/#front-running |
+| 13 | picoCTF 2026 / Reentrance | EVM | introductory reentrancy | https://blog.roblab.us/writeups/picoctf-2026-blockchain-write-ups/#reentrance |
+| 14 | bi0sCTF 2025 / Transient Heist | EVM | EIP-1153 slot confusion and token validation | https://pentest.bi0s.in/blog/posts/TransientHeist-bi0sCTF2025/ |
+| 15 | bi0sCTF 2025 / Transient Heist Revenge | EVM | transient storage, CREATE2, callback composition | https://pentest.bi0s.in/blog/posts/TransientHeistRevenge-bi0sCTF2025/ |
+| 16 | CODEGATE Finals 2025 / DEX | dual EVM chains | relayer and cross-chain amount/accounting | https://hodl.page/entry/codegate-2025-final-blockchain-dex |
+| 17 | HTB Cyber Apocalypse 2025 / Eldorion | EVM | same-transaction calls and block/time semantics | https://github.com/hackthebox/cyber-apocalypse-2025/tree/main/blockchain |
+| 18 | HTB Cyber Apocalypse 2025 / HeliosDEX | EVM/DeFi | rounding and exchange accounting | https://github.com/hackthebox/cyber-apocalypse-2025/tree/main/blockchain |
+| 19 | HTB Cyber Apocalypse 2025 / EldoriaGate | EVM | storage, assembly, role encoding boundaries | https://github.com/hackthebox/cyber-apocalypse-2025/tree/main/blockchain |
+| 20 | BlazCTF 2024 / Eight Inch | EVM/DeFi | intent settlement, integer division, partial fills | https://github.com/fuzzland/blazctf-2024/tree/main/eight-inch |
+| 21 | BlazCTF 2024 / Solalloc | Solana/C | allocator overflow and pointer corruption | https://github.com/fuzzland/blazctf-2024/tree/main/solalloc |
+| 22 | BlazCTF 2024 / Chisel as a Service | Foundry/Chisel | REPL sandbox and toolchain attack surface | https://github.com/fuzzland/blazctf-2024/tree/main/chisel-as-a-service |
+| 23 | BlazCTF 2024 / Teragas | custom EVM | revert rollback and VM implementation divergence | https://github.com/fuzzland/blazctf-2024/tree/main/teragas |
+| 24 | SEKAI CTF 2024 / Play to Earn | EVM | token accounting and signature/permit logic | https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/play-to-earn |
+| 25 | SEKAI CTF 2024 / Ibennto | blockchain | complex on-chain business logic | https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/ibennto |
+| 26 | SEKAI CTF 2024 / SURVIVE | blockchain | complex state and protocol interaction | https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/survive |
+| 27 | SEKAI CTF 2024 / Zoo | EVM assembly | memory layout/corruption and control flow | https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/zoo |
+| 28 | HTB Business CTF 2024 / NotADemocraticElection | EVM | signature forgery | https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/NotADemocraticElection%20%5BEasy%5D |
+| 29 | HTB Business CTF 2024 / MetaVault | EVM | metadata, on-chain secrets, self-verification | https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/MetaVault%20%5BEasy%5D |
+| 30 | HTB Business CTF 2024 / Brokenswap | EVM/DEX | exchange logic and fund extraction | https://github.com/hackthebox/business-ctf-2024/tree/main/blockchain/Brokenswap%20%5BMedium%5D |
 
-我们前面看的 2026 CTF 已经开始大量出现：
+The HTB Cyber Apocalypse repository was previously reported to have ambiguous challenge labels. Verify the exact paths and names before creating separate benchmark entries.
 
-`Sui Move / TON / Stellar / cross-chain / PTB / shared object / relayer / transient storage`
+## Benchmark Tiers
 
-所以如果做一个 **真正面向现代 Blockchain CTF 的 Agent**，其实还有挺大的空间。
+### Deterministic synthetic suite
 
-尤其可以直接拿我们前面整理的 **30 道真实 CTF 题作为 benchmark**，测试 Agent 能不能从 `PP Farming → Outer Stellar → Lootboxes → Transient Heist → Solalloc` 逐级解题。这个项目会比单纯再做一个 Solidity audit agent 有意思得多。
+Create small redistributable fixtures for CI. Each fixture must expose a real setup and verifier, define forbidden shortcuts, and execute in its native toolchain. Include positive cases for each platform route and a negative case that penalizes fabricated vulnerabilities or success output.
+
+### Priority public evaluation
+
+Start with these nine high-information candidates after verification:
+
+1. PP Farming 2: proxy and storage reasoning;
+2. Outer Stellar: cross-chain relayer and attestation;
+3. Lootboxes: Move/PTB composition;
+4. Staking: resource aggregation and time invariant;
+5. Transient Heist Revenge: transient storage, CREATE2, and callbacks;
+6. CODEGATE DEX: multi-chain accounting;
+7. Solalloc: Solana plus native memory corruption;
+8. Teragas: VM rollback divergence;
+9. Zoo: EVM assembly and memory/control flow.
+
+### Coverage evaluation
+
+After metadata verification, use the full catalog to measure breadth and difficulty progression. Do not vendor full repositories by default. Pin revisions and fetch into isolated workspaces. Keep solutions and scoring oracles outside the solver-visible artifacts.
+
+## Related Project Candidates
+
+These projects may contain reusable design ideas. Their current behavior, maintenance status, license, and compatibility must be verified before adoption. Prefer learning from their architecture over importing dependencies.
+
+| Project | Candidate lesson | Link |
+|---|---|---|
+| solexploit-gen | Generate an EVM exploit and verify it through real Anvil execution | https://github.com/CalvinTjoaquinn/solexploit-gen |
+| GPT-Exploit-Generator | Feed build/test/trace failures back into exploit revision | https://github.com/Crimson798/GPT-Exploit-Generator |
+| synapse_agents | Explore independent vulnerability hypotheses | https://github.com/ret2happy/synapse_agents |
+| solidity-agent-kit | Organize Solidity security guidance as agent skills | https://github.com/0xlayerghost/solidity-agent-kit |
+| vuln-agent-eval | Separate vulnerability discovery from verification in evaluation | https://github.com/devival/vuln-agent-eval |
+| ethernaut-with-security-tools | Integrate Foundry, static analysis, fuzzing, and symbolic tools | https://github.com/xternet/ethernaut-with-security-tools |
+| chain-guard | Multi-agent Solidity/Vyper audit structure | https://github.com/Owonftt/chain-guard |
+| spoon-awesome-skill | Web3-oriented agent skill packaging | https://github.com/XSpoonAi/spoon-awesome-skill |
+| RAplus | Generate bytecode-level reentrancy call sequences | https://github.com/contractshark/RAplus |
+| curta.wtf | EVM puzzle/CTF platform structure | https://github.com/waterfall-mkt/curta.wtf |
+
+The final project should not combine these projects mechanically. The transferable ideas are skill routing, independent hypothesis generation, native execution as the oracle, and failure-driven exploit repair. A dedicated multi-agent service, generic vulnerability scanner, or mandatory symbolic engine should be added only if behavioral tests show a concrete need.
+
+## Instructions for the Execution Agent
+
+1. Treat this document as a research backlog and design rationale, not final skill text.
+2. Verify candidate links and claims against primary sources before copying them into references or benchmark metadata.
+3. Record immutable revisions, licenses, setup commands, tool versions, and verifier locations for promoted benchmarks.
+4. Do not expose solution/writeup material to the solving agent during blinded evaluation.
+5. Convert repeated, validated reasoning failures into concise skill instructions; do not encode one challenge's solution as a universal rule.
+6. Keep `SKILL.md` focused on routing and the core solve loop. Put platform details in references loaded only when relevant.
+7. Use native execution evidence to decide whether instructions improve solving performance.
+8. Update or remove entries that cannot be reproduced. Do not preserve claims merely because they appeared in the original conversation.

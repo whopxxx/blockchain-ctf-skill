@@ -18,7 +18,7 @@ This is a solving skill, not a general smart-contract audit checklist, a vulnera
 
 ## 2. Inputs and Current State
 
-- `reference.txt` is historical conversation context. Treat its project links, dates, challenge names, and summaries as leads that require verification. Do not repeat them as facts without checking primary sources.
+- `reference.txt` is a curated research brief distilled from historical conversation. It separates design conclusions from unverified challenge and project candidates. Use it as a research backlog and rationale, not as runtime skill instructions or a trusted source. Verify every external claim against primary sources before promotion.
 - The repository contains a minimal valid skill scaffold. Replace or deepen scaffold content where this brief requires it.
 - The user will separately tell the execution agent how agent/tool-call tests must be invoked. Do not invent a proprietary agent harness. Keep behavioral cases harness-neutral.
 - The repository itself is the skill directory. `SKILL.md` stays at the repository root.
@@ -65,6 +65,7 @@ The execution agent may adjust names when there is a concrete reason, but must p
 |-- AGENT.md
 |-- README.md
 |-- TEST_PLAN.md
+|-- reference.txt             Curated research and candidate catalog; not loaded at runtime
 |-- agents/
 |   `-- openai.yaml
 |-- references/
@@ -231,7 +232,7 @@ Record benchmark results by immutable skill revision, challenge commit, model/ha
 
 ## 9. Source Quality
 
-When improving references from the historical links:
+When improving references from the curated candidate links:
 
 1. prefer official challenge repositories, protocol/framework documentation, EIPs/SIPs, and source code;
 2. pin claims to a commit, tag, or version where practical;

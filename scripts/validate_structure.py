@@ -14,6 +14,7 @@ REQUIRED = (
     "AGENT.md",
     "README.md",
     "TEST_PLAN.md",
+    "reference.txt",
     "agents/openai.yaml",
     "references/methodology.md",
     "references/evm.md",
@@ -96,6 +97,12 @@ def validate(root: Path = ROOT) -> list[str]:
     for path in shipped:
         if path.is_file() and MARKERS.search(path.read_text(encoding="utf-8")):
             errors.append(f"unfinished scaffold marker in {path.relative_to(root)}")
+
+    research_path = root / "reference.txt"
+    if research_path.is_file():
+        research = research_path.read_text(encoding="utf-8")
+        if re.search(r"[?&]utm_[^=]+=", research, re.IGNORECASE):
+            errors.append("reference.txt contains tracking query parameters")
 
     return errors
 

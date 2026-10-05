@@ -2,7 +2,7 @@
 
 A Codex skill scaffold for solving authorized blockchain CTF challenges with a verifier-first, chain-aware, execution-backed workflow.
 
-The implementation contract is in [AGENT.md](AGENT.md). Test scope and behavioral cases are defined in [TEST_PLAN.md](TEST_PLAN.md). Public evaluation candidates are tracked in [benchmarks/manifest.yaml](benchmarks/manifest.yaml). Historical research notes live in `reference.txt` and should be treated as leads until verified against primary sources.
+The implementation contract is in [AGENT.md](AGENT.md). Test scope and behavioral cases are defined in [TEST_PLAN.md](TEST_PLAN.md). Public evaluation candidates are tracked in [benchmarks/manifest.yaml](benchmarks/manifest.yaml). The curated research brief in [reference.txt](reference.txt) records design rationale and unverified source candidates for the execution agent; it is not loaded by the runtime skill.
 
 Run the scaffold checks with:
 

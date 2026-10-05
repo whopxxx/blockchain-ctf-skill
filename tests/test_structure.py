@@ -14,6 +14,10 @@ class StructureTests(unittest.TestCase):
             errors = validate(Path(directory))
         self.assertIn("missing required file: SKILL.md", errors)
 
+    def test_curated_reference_has_no_tracking_parameters(self):
+        research = (ROOT / "reference.txt").read_text(encoding="utf-8")
+        self.assertNotIn("utm_", research.lower())
+
 
 if __name__ == "__main__":
     unittest.main()
