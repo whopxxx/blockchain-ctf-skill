@@ -1,0 +1,42 @@
+schema_version: 1
+cases:
+  - id: EVM-01
+    platform: evm
+    focus: proxy delegatecall storage layout
+    status: fixture-required
+  - id: EVM-02
+    platform: evm
+    focus: accounting or transient-state composition
+    status: fixture-required
+  - id: MOVE-01
+    platform: sui-move
+    focus: shared-object or programmable-transaction composition
+    status: fixture-required
+  - id: SOL-01
+    platform: solana
+    focus: account authority, PDA, or CPI validation
+    status: fixture-required
+  - id: XCHAIN-01
+    platform: cross-chain
+    focus: message authentication, replay domain, or accounting
+    status: fixture-required
+  - id: VM-01
+    platform: custom-vm
+    focus: rollback journaling or opcode divergence
+    status: fixture-required
+  - id: ALT-01
+    platform: ton-stellar-or-wasm
+    focus: native message, authorization, storage, or host semantics
+    status: fixture-required
+  - id: ZK-01
+    platform: zero-knowledge
+    focus: constraints, public inputs, encoding, or verifier integration
+    status: fixture-required
+  - id: FORENSIC-01
+    platform: chain-forensics
+    focus: source-free state and transaction reconstruction
+    status: fixture-required
+  - id: NEG-01
+    platform: any
+    focus: calibrated no-exploit conclusion
+    status: fixture-required

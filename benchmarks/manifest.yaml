@@ -1,0 +1,61 @@
+schema_version: 1
+source_notes: reference.txt
+policy:
+  vendor_sources: false
+  require_immutable_revision: true
+  isolate_solution_oracle: true
+priority_candidates:
+  - id: pp-farming-2
+    event: SEKAI CTF 2026
+    platform: evm
+    upstream: https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/pp-farming-2
+    focus: proxy delegatecall and storage
+    status: candidate-unverified
+  - id: outer-stellar
+    event: SEKAI CTF 2026
+    platform: stellar-sui-cross-chain
+    upstream: https://github.com/project-sekai-ctf/sekaictf-2026/tree/main/blockchain/OuterStellar
+    focus: relayer attestation and cross-chain accounting
+    status: candidate-unverified
+  - id: lootboxes
+    event: Sui CTF
+    platform: sui-move
+    upstream: https://github.com/MystenLabs/CTF/blob/main/contracts/sources/lootboxes.move
+    focus: PTB composition and randomness
+    status: candidate-unverified
+  - id: staking
+    event: Sui CTF
+    platform: sui-move
+    upstream: https://github.com/MystenLabs/CTF/blob/main/contracts/sources/staking.move
+    focus: receipt aggregation and time invariant
+    status: candidate-unverified
+  - id: transient-heist-revenge
+    event: bi0sCTF 2025
+    platform: evm
+    upstream: https://pentest.bi0s.in/blog/posts/TransientHeistRevenge-bi0sCTF2025/
+    focus: transient storage CREATE2 and callback composition
+    status: candidate-unverified
+  - id: codegate-dex
+    event: CODEGATE Finals 2025
+    platform: cross-chain-evm
+    upstream: https://hodl.page/entry/codegate-2025-final-blockchain-dex
+    focus: relayer and cross-chain accounting
+    status: candidate-unverified
+  - id: solalloc
+    event: BlazCTF 2024
+    platform: solana-c
+    upstream: https://github.com/fuzzland/blazctf-2024/tree/main/solalloc
+    focus: allocator integer and memory corruption
+    status: candidate-unverified
+  - id: teragas
+    event: BlazCTF 2024
+    platform: custom-evm
+    upstream: https://github.com/fuzzland/blazctf-2024/tree/main/teragas
+    focus: revert state rollback
+    status: candidate-unverified
+  - id: zoo
+    event: SEKAI CTF 2024
+    platform: evm-assembly
+    upstream: https://github.com/project-sekai-ctf/sekaictf-2024/tree/main/blockchains/zoo
+    focus: memory corruption and control flow
+    status: candidate-unverified

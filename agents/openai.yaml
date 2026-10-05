@@ -1,0 +1,7 @@
+interface:
+  display_name: "Blockchain CTF"
+  short_description: "Analyze and validate blockchain CTF exploits"
+  default_prompt: "Use $blockchain-ctf to solve this authorized blockchain challenge and validate the exploit."
+
+policy:
+  allow_implicit_invocation: true
